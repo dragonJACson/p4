@@ -140,6 +140,15 @@ impl<'a> Parser<'a> {
                     // against tables.
                     "apply".into()
                 }
+                // Allow context-sensitive keywords to be used as identifiers
+                // (commonly used as field names in headers/structs)
+                Kind::Type => "type".into(),
+                Kind::State => "state".into(),
+                Kind::Key => "key".into(),
+                Kind::Actions => "actions".into(),
+                Kind::Entries => "entries".into(),
+                Kind::Default => "default".into(),
+                Kind::Size => "size".into(),
                 _ => {
                     return Err(ParserError {
                         at: token.clone(),
@@ -188,6 +197,7 @@ impl<'a> Parser<'a> {
                 lexer::Kind::Bool => Type::Bool,
                 lexer::Kind::Error => Type::Error,
                 lexer::Kind::String => Type::String,
+                lexer::Kind::Void => Type::Void,
                 lexer::Kind::Bit => {
                     Type::Bit(self.parse_optional_width_parameter()?)
                 }

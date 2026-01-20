@@ -9,35 +9,49 @@ pub enum Kind {
     //
     // keywords
     //
-    Const,
-    Header,
-    Typedef,
-    Control,
-    Struct,
+    Abstract,
     Action,
-    Parser,
-    Table,
-    Size,
-    Key,
-    Exact,
-    Ternary,
-    Lpm,
-    Range,
     Actions,
+    Apply,
+    Const,
+    Control,
+    Default,
     DefaultAction,
+    Else,
     Entries,
+    Enum,
+    Exact,
+    Exit,
+    Extern,
+    Header,
+    HeaderUnion,
+    If,
     In,
     InOut,
+    Key,
+    List,
+    Lpm,
+    MatchKind,
     Out,
-    Transition,
-    State,
-    Select,
-    Apply,
     Package,
-    Extern,
-    If,
-    Else,
+    Parser,
+    Range,
     Return,
+    Select,
+    Size,
+    State,
+    Struct,
+    Switch,
+    Table,
+    Ternary,
+    This,
+    Transition,
+    Tuple,
+    Type,
+    Typedef,
+    ValueSet,
+    Verify,
+    Void,
 
     //
     // types
@@ -77,23 +91,32 @@ pub enum Kind {
     //
     // operators
     //
-    DoubleEquals,
-    NotEquals,
-    Equals,
-    Plus,
-    Minus,
-    Mod,
-    Dot,
-    Mask,
-    LogicalAnd,
     And,
     Bang,
-    Tilde,
-    Shl,
-    Pipe,
     Carat,
+    ColonColon,
+    Div,
+    Dot,
+    DoubleEquals,
+    Equals,
     GreaterThanEquals,
     LessThanEquals,
+    LogicalAnd,
+    LogicalOr,
+    Mask,
+    Minus,
+    Mod,
+    Mul,
+    NotEquals,
+    Pipe,
+    Plus,
+    PlusPlus,
+    Question,
+    SaturatingAdd,
+    SaturatingSub,
+    Shl,
+    Shr,
+    Tilde,
 
     //
     // literals
@@ -138,35 +161,49 @@ impl fmt::Display for Kind {
             //
             // keywords
             //
-            Kind::Const => write!(f, "keyword const"),
-            Kind::Header => write!(f, "keyword header"),
-            Kind::Typedef => write!(f, "keyword typedef"),
-            Kind::Control => write!(f, "keyword control"),
-            Kind::Struct => write!(f, "keyword struct"),
+            Kind::Abstract => write!(f, "keyword abstract"),
             Kind::Action => write!(f, "keyword action"),
-            Kind::Parser => write!(f, "keyword parser"),
-            Kind::Table => write!(f, "keyword table"),
-            Kind::Size => write!(f, "keyword size"),
-            Kind::Key => write!(f, "keyword key"),
-            Kind::Exact => write!(f, "keyword exact"),
-            Kind::Ternary => write!(f, "keyword ternary"),
-            Kind::Lpm => write!(f, "keyword lpm"),
-            Kind::Range => write!(f, "keyword range"),
             Kind::Actions => write!(f, "keyword actions"),
-            Kind::DefaultAction => write!(f, "keyword default_action"),
-            Kind::Entries => write!(f, "keyword entries"),
-            Kind::In => write!(f, "keyword in"),
-            Kind::InOut => write!(f, "keyword in_out"),
-            Kind::Out => write!(f, "keyword out"),
-            Kind::Transition => write!(f, "keyword transition"),
-            Kind::State => write!(f, "keyword state"),
-            Kind::Select => write!(f, "keyword select"),
             Kind::Apply => write!(f, "keyword apply"),
-            Kind::Package => write!(f, "keyword package"),
-            Kind::Extern => write!(f, "keyword extern"),
-            Kind::If => write!(f, "keyword if"),
+            Kind::Const => write!(f, "keyword const"),
+            Kind::Control => write!(f, "keyword control"),
+            Kind::Default => write!(f, "keyword default"),
+            Kind::DefaultAction => write!(f, "keyword default_action"),
             Kind::Else => write!(f, "keyword else"),
+            Kind::Entries => write!(f, "keyword entries"),
+            Kind::Enum => write!(f, "keyword enum"),
+            Kind::Exact => write!(f, "keyword exact"),
+            Kind::Exit => write!(f, "keyword exit"),
+            Kind::Extern => write!(f, "keyword extern"),
+            Kind::Header => write!(f, "keyword header"),
+            Kind::HeaderUnion => write!(f, "keyword header_union"),
+            Kind::If => write!(f, "keyword if"),
+            Kind::In => write!(f, "keyword in"),
+            Kind::InOut => write!(f, "keyword inout"),
+            Kind::Key => write!(f, "keyword key"),
+            Kind::List => write!(f, "keyword list"),
+            Kind::Lpm => write!(f, "keyword lpm"),
+            Kind::MatchKind => write!(f, "keyword match_kind"),
+            Kind::Out => write!(f, "keyword out"),
+            Kind::Package => write!(f, "keyword package"),
+            Kind::Parser => write!(f, "keyword parser"),
+            Kind::Range => write!(f, "keyword range"),
             Kind::Return => write!(f, "keyword return"),
+            Kind::Select => write!(f, "keyword select"),
+            Kind::Size => write!(f, "keyword size"),
+            Kind::State => write!(f, "keyword state"),
+            Kind::Struct => write!(f, "keyword struct"),
+            Kind::Switch => write!(f, "keyword switch"),
+            Kind::Table => write!(f, "keyword table"),
+            Kind::Ternary => write!(f, "keyword ternary"),
+            Kind::This => write!(f, "keyword this"),
+            Kind::Transition => write!(f, "keyword transition"),
+            Kind::Tuple => write!(f, "keyword tuple"),
+            Kind::Type => write!(f, "keyword type"),
+            Kind::Typedef => write!(f, "keyword typedef"),
+            Kind::ValueSet => write!(f, "keyword value_set"),
+            Kind::Verify => write!(f, "keyword verify"),
+            Kind::Void => write!(f, "keyword void"),
 
             //
             // types
@@ -206,23 +243,32 @@ impl fmt::Display for Kind {
             //
             // operators
             //
-            Kind::DoubleEquals => write!(f, "operator =="),
-            Kind::NotEquals => write!(f, "operator !="),
-            Kind::Equals => write!(f, "operator ="),
-            Kind::Plus => write!(f, "operator +"),
-            Kind::Minus => write!(f, "operator -"),
-            Kind::Mod => write!(f, "operator %"),
-            Kind::Dot => write!(f, "operator ."),
-            Kind::Mask => write!(f, "operator &&&"),
-            Kind::LogicalAnd => write!(f, "operator &&"),
             Kind::And => write!(f, "operator &"),
             Kind::Bang => write!(f, "operator !"),
-            Kind::Tilde => write!(f, "operator ~"),
-            Kind::Shl => write!(f, "operator <<"),
-            Kind::Pipe => write!(f, "operator |"),
             Kind::Carat => write!(f, "operator ^"),
+            Kind::ColonColon => write!(f, "operator ::"),
+            Kind::Div => write!(f, "operator /"),
+            Kind::Dot => write!(f, "operator ."),
+            Kind::DoubleEquals => write!(f, "operator =="),
+            Kind::Equals => write!(f, "operator ="),
             Kind::GreaterThanEquals => write!(f, "operator >="),
             Kind::LessThanEquals => write!(f, "operator <="),
+            Kind::LogicalAnd => write!(f, "operator &&"),
+            Kind::LogicalOr => write!(f, "operator ||"),
+            Kind::Mask => write!(f, "operator &&&"),
+            Kind::Minus => write!(f, "operator -"),
+            Kind::Mod => write!(f, "operator %"),
+            Kind::Mul => write!(f, "operator *"),
+            Kind::NotEquals => write!(f, "operator !="),
+            Kind::Pipe => write!(f, "operator |"),
+            Kind::Plus => write!(f, "operator +"),
+            Kind::PlusPlus => write!(f, "operator ++"),
+            Kind::Question => write!(f, "operator ?"),
+            Kind::SaturatingAdd => write!(f, "operator |+|"),
+            Kind::SaturatingSub => write!(f, "operator |-|"),
+            Kind::Shl => write!(f, "operator <<"),
+            Kind::Shr => write!(f, "operator >>"),
+            Kind::Tilde => write!(f, "operator ~"),
 
             //
             // literals
@@ -339,276 +385,282 @@ impl<'a> Lexer<'a> {
             return Ok(t);
         }
 
+        // Multi-character operators (longest first)
         if let Some(t) = self.match_token("&&&", Kind::Mask) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("inout", Kind::InOut) {
+        if let Some(t) = self.match_token("|+|", Kind::SaturatingAdd) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("in", Kind::In) {
+        if let Some(t) = self.match_token("|-|", Kind::SaturatingSub) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("out", Kind::Out) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("transition", Kind::Transition) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("state", Kind::State) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("select", Kind::Select) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("apply", Kind::Apply) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("package", Kind::Package) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("extern", Kind::Extern) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("if", Kind::If) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("else", Kind::Else) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("return", Kind::Return) {
-            return Ok(t);
-        }
-
         if let Some(t) = self.match_token("&&", Kind::LogicalAnd) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("&", Kind::And) {
+        if let Some(t) = self.match_token("||", Kind::LogicalOr) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("==", Kind::DoubleEquals) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("!=", Kind::NotEquals) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("|", Kind::Pipe) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("<<", Kind::Shl) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("<", Kind::AngleOpen) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token(">", Kind::AngleClose) {
-            return Ok(t);
-        }
-
         if let Some(t) = self.match_token(">=", Kind::GreaterThanEquals) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token(">=", Kind::LessThanEquals) {
+        if let Some(t) = self.match_token("<=", Kind::LessThanEquals) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("<<", Kind::Shl) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token(">>", Kind::Shr) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("++", Kind::PlusPlus) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("::", Kind::ColonColon) {
             return Ok(t);
         }
 
+        // Single-character operators and punctuation
+        if let Some(t) = self.match_token("&", Kind::And) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("|", Kind::Pipe) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("<", Kind::AngleOpen) {
+            return Ok(t);
+        }
         if let Some(t) = self.match_token(">", Kind::AngleClose) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("{", Kind::CurlyOpen) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("}", Kind::CurlyClose) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("(", Kind::ParenOpen) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token(")", Kind::ParenClose) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("[", Kind::SquareOpen) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("]", Kind::SquareClose) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("+", Kind::Plus) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("-", Kind::Minus) {
             return Ok(t);
         }
-
+        if let Some(t) = self.match_token("*", Kind::Mul) {
+            return Ok(t);
+        }
         if let Some(t) = self.match_token("%", Kind::Mod) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("=", Kind::Equals) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token(":", Kind::Colon) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("_", Kind::Underscore) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token(";", Kind::Semicolon) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token(".", Kind::Dot) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("^", Kind::Carat) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token(",", Kind::Comma) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("@", Kind::At) {
             return Ok(t);
         }
-
+        if let Some(t) = self.match_token("?", Kind::Question) {
+            return Ok(t);
+        }
         if let Some(t) = self.match_token("!", Kind::Bang) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("~", Kind::Tilde) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("\\", Kind::Backslash) {
             return Ok(t);
         }
-
         if let Some(t) = self.match_token("/", Kind::Forwardslash) {
             return Ok(t);
         }
 
-        if let Some(t) = self.match_token("bool", Kind::Bool) {
+        // Keywords (longer/compound keywords first to avoid prefix matching issues)
+        if let Some(t) = self.match_token("abstract", Kind::Abstract) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("varbit", Kind::Varbit) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("bit", Kind::Bit) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("int", Kind::Int) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("typedef", Kind::Typedef) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("header", Kind::Header) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("const", Kind::Const) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("control", Kind::Control) {
-            return Ok(t);
-        }
-
-        if let Some(t) = self.match_token("struct", Kind::Struct) {
-            return Ok(t);
-        }
-
         if let Some(t) = self.match_token("actions", Kind::Actions) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("default_action", Kind::DefaultAction)
-        {
-            return Ok(t);
-        }
-
         if let Some(t) = self.match_token("action", Kind::Action) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("parser", Kind::Parser) {
+        if let Some(t) = self.match_token("apply", Kind::Apply) {
             return Ok(t);
         }
-
+        if let Some(t) = self.match_token("bool", Kind::Bool) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("const", Kind::Const) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("control", Kind::Control) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("default_action", Kind::DefaultAction) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("default", Kind::Default) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("else", Kind::Else) {
+            return Ok(t);
+        }
         if let Some(t) = self.match_token("entries", Kind::Entries) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("table", Kind::Table) {
+        if let Some(t) = self.match_token("enum", Kind::Enum) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("size", Kind::Size) {
+        if let Some(t) = self.match_token("error", Kind::Error) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("key", Kind::Key) {
-            return Ok(t);
-        }
-
         if let Some(t) = self.match_token("exact", Kind::Exact) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("ternary", Kind::Ternary) {
+        if let Some(t) = self.match_token("exit", Kind::Exit) {
             return Ok(t);
         }
-
+        if let Some(t) = self.match_token("extern", Kind::Extern) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("false", Kind::FalseLiteral) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("header_union", Kind::HeaderUnion) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("header", Kind::Header) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("if", Kind::If) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("inout", Kind::InOut) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("in", Kind::In) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("int", Kind::Int) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("key", Kind::Key) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("list", Kind::List) {
+            return Ok(t);
+        }
         if let Some(t) = self.match_token("lpm", Kind::Lpm) {
             return Ok(t);
         }
-
+        if let Some(t) = self.match_token("match_kind", Kind::MatchKind) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("out", Kind::Out) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("package", Kind::Package) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("parser", Kind::Parser) {
+            return Ok(t);
+        }
         if let Some(t) = self.match_token("range", Kind::Range) {
             return Ok(t);
         }
-
+        if let Some(t) = self.match_token("return", Kind::Return) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("select", Kind::Select) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("size", Kind::Size) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("state", Kind::State) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("string", Kind::String) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("struct", Kind::Struct) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("switch", Kind::Switch) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("table", Kind::Table) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("ternary", Kind::Ternary) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("this", Kind::This) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("transition", Kind::Transition) {
+            return Ok(t);
+        }
         if let Some(t) = self.match_token("true", Kind::TrueLiteral) {
             return Ok(t);
         }
-
-        if let Some(t) = self.match_token("false", Kind::FalseLiteral) {
+        if let Some(t) = self.match_token("tuple", Kind::Tuple) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("typedef", Kind::Typedef) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("type", Kind::Type) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("value_set", Kind::ValueSet) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("varbit", Kind::Varbit) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("verify", Kind::Verify) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("void", Kind::Void) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("bit", Kind::Bit) {
             return Ok(t);
         }
 
@@ -952,8 +1004,6 @@ impl<'a> Lexer<'a> {
         match chars.next() {
             Some(';') => return &self.cursor[..1],
             Some(',') => return &self.cursor[..1],
-            Some('+') => return &self.cursor[..1],
-            Some('-') => return &self.cursor[..1],
             Some('(') => return &self.cursor[..1],
             Some(')') => return &self.cursor[..1],
             Some('{') => return &self.cursor[..1],
@@ -961,14 +1011,25 @@ impl<'a> Lexer<'a> {
             Some('[') => return &self.cursor[..1],
             Some(']') => return &self.cursor[..1],
             Some('.') => return &self.cursor[..1],
-            Some(':') => return &self.cursor[..1],
             Some('*') => return &self.cursor[..1],
-            Some('|') => return &self.cursor[..1],
             Some('~') => return &self.cursor[..1],
             Some('^') => return &self.cursor[..1],
             Some('\\') => return &self.cursor[..1],
             Some('/') => return &self.cursor[..1],
             Some('@') => return &self.cursor[..1],
+            Some('?') => return &self.cursor[..1],
+            Some('+') => match chars.next() {
+                Some('+') => return &self.cursor[..2],
+                _ => return &self.cursor[..1],
+            },
+            Some('-') => match chars.next() {
+                Some('|') => return &self.cursor[..1],
+                _ => return &self.cursor[..1],
+            },
+            Some(':') => match chars.next() {
+                Some(':') => return &self.cursor[..2],
+                _ => return &self.cursor[..1],
+            },
             Some('!') => match chars.next() {
                 Some('=') => return &self.cursor[..2],
                 _ => return &self.cursor[..1],
@@ -979,6 +1040,7 @@ impl<'a> Lexer<'a> {
             },
             Some('>') => match chars.next() {
                 Some('=') => return &self.cursor[..2],
+                Some('>') => return &self.cursor[..2],
                 _ => return &self.cursor[..1],
             },
             Some('<') => match chars.next() {
@@ -990,6 +1052,18 @@ impl<'a> Lexer<'a> {
                 Some('&') => match chars.next() {
                     Some('&') => return &self.cursor[..3],
                     _ => return &self.cursor[..2],
+                },
+                _ => return &self.cursor[..1],
+            },
+            Some('|') => match chars.next() {
+                Some('|') => return &self.cursor[..2],
+                Some('+') => match chars.next() {
+                    Some('|') => return &self.cursor[..3],
+                    _ => return &self.cursor[..1],
+                },
+                Some('-') => match chars.next() {
+                    Some('|') => return &self.cursor[..3],
+                    _ => return &self.cursor[..1],
                 },
                 _ => return &self.cursor[..1],
             },
@@ -1080,6 +1154,9 @@ impl<'a> Lexer<'a> {
             return true;
         }
         if c == '@' {
+            return true;
+        }
+        if c == '?' {
             return true;
         }
         false
