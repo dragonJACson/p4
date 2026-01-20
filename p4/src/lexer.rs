@@ -10,6 +10,7 @@ pub enum Kind {
     // keywords
     //
     Abstract,
+    Accept,
     Action,
     Actions,
     Apply,
@@ -36,6 +37,7 @@ pub enum Kind {
     Package,
     Parser,
     Range,
+    Reject,
     Return,
     Select,
     Size,
@@ -162,6 +164,7 @@ impl fmt::Display for Kind {
             // keywords
             //
             Kind::Abstract => write!(f, "keyword abstract"),
+            Kind::Accept => write!(f, "keyword accept"),
             Kind::Action => write!(f, "keyword action"),
             Kind::Actions => write!(f, "keyword actions"),
             Kind::Apply => write!(f, "keyword apply"),
@@ -188,6 +191,7 @@ impl fmt::Display for Kind {
             Kind::Package => write!(f, "keyword package"),
             Kind::Parser => write!(f, "keyword parser"),
             Kind::Range => write!(f, "keyword range"),
+            Kind::Reject => write!(f, "keyword reject"),
             Kind::Return => write!(f, "keyword return"),
             Kind::Select => write!(f, "keyword select"),
             Kind::Size => write!(f, "keyword size"),
@@ -513,6 +517,9 @@ impl<'a> Lexer<'a> {
         if let Some(t) = self.match_token("abstract", Kind::Abstract) {
             return Ok(t);
         }
+        if let Some(t) = self.match_token("accept", Kind::Accept) {
+            return Ok(t);
+        }
         if let Some(t) = self.match_token("actions", Kind::Actions) {
             return Ok(t);
         }
@@ -601,6 +608,9 @@ impl<'a> Lexer<'a> {
             return Ok(t);
         }
         if let Some(t) = self.match_token("range", Kind::Range) {
+            return Ok(t);
+        }
+        if let Some(t) = self.match_token("reject", Kind::Reject) {
             return Ok(t);
         }
         if let Some(t) = self.match_token("return", Kind::Return) {

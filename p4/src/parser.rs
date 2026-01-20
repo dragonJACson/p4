@@ -147,7 +147,10 @@ impl<'a> Parser<'a> {
                 Kind::Key => "key".into(),
                 Kind::Actions => "actions".into(),
                 Kind::Entries => "entries".into(),
+                Kind::Accept => "accept".into(),
                 Kind::Default => "default".into(),
+                Kind::Reject => "reject".into(),
+                Kind::Verify => "verify".into(),
                 Kind::Size => "size".into(),
                 _ => {
                     return Err(ParserError {
@@ -349,6 +352,12 @@ impl<'a> Parser<'a> {
                     token,
                 }]);
             }
+            lexer::Kind::Default => {
+                return Ok(vec![KeySetElement {
+                    value: KeySetElementValue::Default,
+                    token,
+                }]);
+            }
             _ => {
                 self.backlog.push(token.clone());
                 let mut ep = ExpressionParser::new(self);
@@ -382,6 +391,30 @@ impl<'a> Parser<'a> {
                                     "Found {} expected: \
                                     comma or paren close after \
                                     dont-care match",
+                                    token.kind,
+                                ),
+                                source: self.lexer.lines[token.line].into(),
+                            }
+                            .into())
+                        }
+                    }
+                }
+                lexer::Kind::Default => {
+                    elements.push(KeySetElement {
+                        value: KeySetElementValue::Default,
+                        token: token.clone(),
+                    });
+                    let token = self.next_token()?;
+                    match token.kind {
+                        lexer::Kind::Comma => continue,
+                        lexer::Kind::ParenClose => return Ok(elements),
+                        _ => {
+                            return Err(ParserError {
+                                at: token.clone(),
+                                message: format!(
+                                    "Found {} expected: \
+                                    comma or paren close after \
+                                    default match",
                                     token.kind,
                                 ),
                                 source: self.lexer.lines[token.line].into(),
@@ -437,8 +470,7 @@ impl<'a> Parser<'a> {
                         }
                     }
                 }
-                //TODO Default case
-                //TODO DontCare case
+                            //TODO DontCare case
                 _ => {
                     return Err(ParserError {
                         at: token.clone(),
@@ -553,7 +585,8 @@ impl<'a> Parser<'a> {
 
                 lexer::Kind::Identifier(_)
                 | lexer::Kind::If
-                | lexer::Kind::Return => {
+                | lexer::Kind::Return
+                | lexer::Kind::Verify => {
                     // push the identifier token into the backlog and run the
                     // statement parser
                     self.backlog.push(token);
@@ -594,9 +627,17 @@ impl<'a> Parser<'a> {
                 let select = sp.run()?;
                 Ok(Transition::Select(select))
             }
-            lexer::Kind::Identifier(ref name) => {
+            lexer::Kind::Identifier(_)
+            | lexer::Kind::Accept
+            | lexer::Kind::Reject => {
+                let name = match &token.kind {
+                    lexer::Kind::Accept => "accept".to_string(),
+                    lexer::Kind::Reject => "reject".to_string(),
+                    lexer::Kind::Identifier(name) => name.clone(),
+                    _ => unreachable!(),
+                };
                 let result = Transition::Reference(Lvalue {
-                    name: name.clone(),
+                    name,
                     token: token.clone(),
                 });
                 self.expect_token(lexer::Kind::Semicolon)?;

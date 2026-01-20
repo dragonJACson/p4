@@ -308,12 +308,15 @@ fn process_macro_begin(
         }
     };
 
-    let value = match parts.next() {
+    let mut value = match parts.next() {
         Some(v) => v.trim().to_string(),
         None => "".into(),
     };
 
     let continued = line.ends_with('\\');
+    if continued && value.ends_with('\\') {
+        value.pop();
+    }
     Ok((name, value, continued))
 }
 

@@ -24,6 +24,7 @@ pub enum UserDefinedType<'a> {
     Struct(&'a Struct),
     Header(&'a Header),
     Extern(&'a Extern),
+    Typedef(&'a Typedef),
 }
 
 impl AST {
@@ -59,6 +60,9 @@ impl AST {
         }
         if let Some(platform_extern) = self.get_extern(name) {
             return Some(UserDefinedType::Extern(platform_extern));
+        }
+        if let Some(typedef) = self.typedefs.iter().find(|t| t.name == name) {
+            return Some(UserDefinedType::Typedef(typedef));
         }
         None
     }
