@@ -64,6 +64,7 @@ pub enum Kind {
     Comma,
     Colon,
     Underscore,
+    At,
 
     //
     // preprocessor
@@ -192,6 +193,7 @@ impl fmt::Display for Kind {
             Kind::Comma => write!(f, ","),
             Kind::Colon => write!(f, ":"),
             Kind::Underscore => write!(f, "_"),
+            Kind::At => write!(f, "@"),
 
             //
             // preprocessor
@@ -494,6 +496,10 @@ impl<'a> Lexer<'a> {
         }
 
         if let Some(t) = self.match_token(",", Kind::Comma) {
+            return Ok(t);
+        }
+
+        if let Some(t) = self.match_token("@", Kind::At) {
             return Ok(t);
         }
 
@@ -962,6 +968,7 @@ impl<'a> Lexer<'a> {
             Some('^') => return &self.cursor[..1],
             Some('\\') => return &self.cursor[..1],
             Some('/') => return &self.cursor[..1],
+            Some('@') => return &self.cursor[..1],
             Some('!') => match chars.next() {
                 Some('=') => return &self.cursor[..2],
                 _ => return &self.cursor[..1],
@@ -1070,6 +1077,9 @@ impl<'a> Lexer<'a> {
             return true;
         }
         if c == '/' {
+            return true;
+        }
+        if c == '@' {
             return true;
         }
         false

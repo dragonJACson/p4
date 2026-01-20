@@ -34,11 +34,64 @@ impl<'a> Parser<'a> {
     }
 
     pub fn next_token(&mut self) -> Result<Token, Error> {
-        if self.backlog.is_empty() {
-            Ok(self.lexer.next()?)
+        let token = if self.backlog.is_empty() {
+            self.lexer.next()?
         } else {
-            Ok(self.backlog.pop().unwrap())
+            self.backlog.pop().unwrap()
+        };
+
+        if token.kind == lexer::Kind::At {
+            self.skip_annotation(token)?;
+            return self.next_token();
         }
+
+        Ok(token)
+    }
+
+    fn skip_annotation(&mut self, at_token: Token) -> Result<(), Error> {
+        let name = self.next_token()?;
+        match name.kind {
+            lexer::Kind::Identifier(_) => {}
+            _ => {
+                return Err(ParserError {
+                    at: name.clone(),
+                    message: "Invalid annotation".into(),
+                    source: self.lexer.lines[at_token.line].into(),
+                }
+                .into())
+            }
+        }
+
+        let token = self.next_token()?;
+        if token.kind != lexer::Kind::ParenOpen {
+            self.backlog.push(token);
+            return Ok(());
+        }
+
+        let mut depth = 1usize;
+        loop {
+            let t = self.next_token()?;
+            match t.kind {
+                lexer::Kind::ParenOpen => depth += 1,
+                lexer::Kind::ParenClose => {
+                    depth = depth.saturating_sub(1);
+                    if depth == 0 {
+                        break;
+                    }
+                }
+                lexer::Kind::Eof => {
+                    return Err(ParserError {
+                        at: t.clone(),
+                        message: "Unterminated annotation".into(),
+                        source: self.lexer.lines[at_token.line].into(),
+                    }
+                    .into())
+                }
+                _ => {}
+            }
+        }
+
+        Ok(())
     }
 
     /// Consume a series of tokens constituting a path. Returns the first
