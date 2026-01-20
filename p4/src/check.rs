@@ -571,6 +571,7 @@ fn check_statement_lvalues(
                 NameInfo {
                     ty: v.ty.clone(),
                     decl: DeclarationInfo::Local,
+                    token: v.token.clone(),
                 },
             );
         }

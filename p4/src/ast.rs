@@ -222,14 +222,18 @@ pub struct Package {
     pub name: String,
     pub type_parameters: Vec<String>,
     pub parameters: Vec<PackageParameter>,
+
+    /// The token for the package name.
+    pub token: Token,
 }
 
 impl Package {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Self {
             name,
             type_parameters: Vec::new(),
             parameters: Vec::new(),
+            token,
         }
     }
 
@@ -267,14 +271,18 @@ pub struct PackageParameter {
     pub type_name: String,
     pub type_parameters: Vec<String>,
     pub name: String,
+
+    /// The token for the parameter name.
+    pub token: Token,
 }
 
 impl PackageParameter {
-    pub fn new(type_name: String) -> Self {
+    pub fn new(type_name: String, token: Token) -> Self {
         Self {
             type_name,
             type_parameters: Vec::new(),
             name: String::new(),
+            token,
         }
     }
 
@@ -382,6 +390,9 @@ impl fmt::Display for Type {
 pub struct Typedef {
     pub ty: Type,
     pub name: String,
+
+    /// The token for the typedef name.
+    pub token: Token,
 }
 
 impl Typedef {
@@ -411,6 +422,9 @@ pub struct Constant {
     pub ty: Type,
     pub name: String,
     pub initializer: Box<Expression>,
+
+    /// The token for the constant name.
+    pub token: Token,
 }
 
 impl Constant {
@@ -697,13 +711,17 @@ impl BinOp {
 pub struct Header {
     pub name: String,
     pub members: Vec<HeaderMember>,
+
+    /// The token for the header name.
+    pub token: Token,
 }
 
 impl Header {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Header {
             name,
             members: Vec::new(),
+            token,
         }
     }
     pub fn names(&self) -> HashMap<String, NameInfo> {
@@ -713,6 +731,7 @@ impl Header {
             NameInfo {
                 ty: Type::HeaderMethod,
                 decl: DeclarationInfo::Method,
+                token: self.token.clone(),
             },
         );
         names.insert(
@@ -720,6 +739,7 @@ impl Header {
             NameInfo {
                 ty: Type::HeaderMethod,
                 decl: DeclarationInfo::Method,
+                token: self.token.clone(),
             },
         );
         names.insert(
@@ -727,6 +747,7 @@ impl Header {
             NameInfo {
                 ty: Type::HeaderMethod,
                 decl: DeclarationInfo::Method,
+                token: self.token.clone(),
             },
         );
         for p in &self.members {
@@ -735,6 +756,7 @@ impl Header {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::HeaderMember,
+                    token: p.token.clone(),
                 },
             );
         }
@@ -803,13 +825,17 @@ impl HeaderMember {
 pub struct Struct {
     pub name: String,
     pub members: Vec<StructMember>,
+
+    /// The token for the struct name.
+    pub token: Token,
 }
 
 impl Struct {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Struct {
             name,
             members: Vec::new(),
+            token,
         }
     }
     pub fn names(&self) -> HashMap<String, NameInfo> {
@@ -820,6 +846,7 @@ impl Struct {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::StructMember,
+                    token: p.token.clone(),
                 },
             );
         }
@@ -894,10 +921,13 @@ pub struct Control {
     pub actions: Vec<Action>,
     pub tables: Vec<Table>,
     pub apply: StatementBlock,
+
+    /// The token for the control name.
+    pub token: Token,
 }
 
 impl Control {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Self {
             name,
             variables: Vec::new(),
@@ -907,6 +937,7 @@ impl Control {
             actions: Vec::new(),
             tables: Vec::new(),
             apply: StatementBlock::default(),
+            token,
         }
     }
 
@@ -975,6 +1006,7 @@ impl Control {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::Parameter(p.direction),
+                    token: p.name_token.clone(),
                 },
             );
         }
@@ -984,6 +1016,7 @@ impl Control {
                 NameInfo {
                     ty: Type::Table,
                     decl: DeclarationInfo::ControlTable,
+                    token: t.token.clone(),
                 },
             );
         }
@@ -993,6 +1026,7 @@ impl Control {
                 NameInfo {
                     ty: v.ty.clone(),
                     decl: DeclarationInfo::ControlMember,
+                    token: v.token.clone(),
                 },
             );
         }
@@ -1002,6 +1036,7 @@ impl Control {
                 NameInfo {
                     ty: c.ty.clone(),
                     decl: DeclarationInfo::ControlMember,
+                    token: c.token.clone(),
                 },
             );
         }
@@ -1011,6 +1046,7 @@ impl Control {
                 NameInfo {
                     ty: Type::Action,
                     decl: DeclarationInfo::Action,
+                    token: a.token.clone(),
                 },
             );
         }
@@ -1153,6 +1189,7 @@ impl Parser {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::Parameter(p.direction),
+                    token: p.name_token.clone(),
                 },
             );
         }
@@ -1162,6 +1199,7 @@ impl Parser {
                 NameInfo {
                     ty: Type::State,
                     decl: DeclarationInfo::State,
+                    token: s.token.clone(),
                 },
             );
         }
@@ -1272,14 +1310,18 @@ pub struct Action {
     pub name: String,
     pub parameters: Vec<ActionParameter>,
     pub statement_block: StatementBlock,
+
+    /// The token for the action name.
+    pub token: Token,
 }
 
 impl Action {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Self {
             name,
             parameters: Vec::new(),
             statement_block: StatementBlock::default(),
+            token,
         }
     }
 
@@ -1291,6 +1333,7 @@ impl Action {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::ActionParameter(p.direction),
+                    token: p.name_token.clone(),
                 },
             );
         }
@@ -2175,6 +2218,7 @@ impl Extern {
                 NameInfo {
                     ty: Type::ExternFunction,
                     decl: DeclarationInfo::Method,
+                    token: p.token.clone(),
                 },
             );
         }
@@ -2220,6 +2264,9 @@ pub struct ExternMethod {
     pub name: String,
     pub type_parameters: Vec<String>,
     pub parameters: Vec<ControlParameter>,
+
+    /// The token for the method name.
+    pub token: Token,
 }
 
 impl ExternMethod {
@@ -2274,6 +2321,7 @@ pub enum DeclarationInfo {
 pub struct NameInfo {
     pub ty: Type,
     pub decl: DeclarationInfo,
+    pub token: Token,
 }
 
 pub trait Visitor {
