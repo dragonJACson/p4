@@ -217,83 +217,6 @@ impl PackageInstance {
     }
 }
 
-#[derive(Debug)]
-pub struct Package {
-    pub name: String,
-    pub type_parameters: Vec<String>,
-    pub parameters: Vec<PackageParameter>,
-}
-
-impl Package {
-    pub fn new(name: String) -> Self {
-        Self {
-            name,
-            type_parameters: Vec::new(),
-            parameters: Vec::new(),
-        }
-    }
-
-    pub fn accept<V: Visitor>(&self, v: &V) {
-        v.package(self);
-        for p in &self.parameters {
-            p.accept(v);
-        }
-    }
-
-    pub fn accept_mut<V: VisitorMut>(&self, v: &mut V) {
-        v.package(self);
-        for p in &self.parameters {
-            p.accept_mut(v);
-        }
-    }
-
-    pub fn mut_accept<V: MutVisitor>(&mut self, v: &V) {
-        v.package(self);
-        for p in &mut self.parameters {
-            p.mut_accept(v);
-        }
-    }
-
-    pub fn mut_accept_mut<V: MutVisitorMut>(&mut self, v: &mut V) {
-        v.package(self);
-        for p in &mut self.parameters {
-            p.mut_accept_mut(v);
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct PackageParameter {
-    pub type_name: String,
-    pub type_parameters: Vec<String>,
-    pub name: String,
-}
-
-impl PackageParameter {
-    pub fn new(type_name: String) -> Self {
-        Self {
-            type_name,
-            type_parameters: Vec::new(),
-            name: String::new(),
-        }
-    }
-
-    pub fn accept<V: Visitor>(&self, v: &V) {
-        v.package_parameter(self);
-    }
-
-    pub fn accept_mut<V: VisitorMut>(&self, v: &mut V) {
-        v.package_parameter(self);
-    }
-
-    pub fn mut_accept<V: MutVisitor>(&mut self, v: &V) {
-        v.package_parameter(self);
-    }
-
-    pub fn mut_accept_mut<V: MutVisitorMut>(&mut self, v: &mut V) {
-        v.package_parameter(self);
-    }
-}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
@@ -382,6 +305,7 @@ impl fmt::Display for Type {
 pub struct Typedef {
     pub ty: Type,
     pub name: String,
+    pub token: Token,
 }
 
 impl Typedef {
@@ -410,6 +334,7 @@ impl Typedef {
 pub struct Constant {
     pub ty: Type,
     pub name: String,
+    pub token: Token,
     pub initializer: Box<Expression>,
 }
 
@@ -694,15 +619,99 @@ impl BinOp {
 }
 
 #[derive(Debug, Clone)]
+pub struct Package {
+    pub name: String,
+    pub token: Token,
+    pub type_parameters: Vec<String>,
+    pub parameters: Vec<PackageParameter>,
+}
+
+impl Package {
+    pub fn new(name: String, token: Token) -> Self {
+        Self {
+            name,
+            token,
+            type_parameters: Vec::new(),
+            parameters: Vec::new(),
+        }
+    }
+
+    pub fn accept<V: Visitor>(&self, v: &V) {
+        v.package(self);
+        for p in &self.parameters {
+            p.accept(v);
+        }
+    }
+
+    pub fn accept_mut<V: VisitorMut>(&self, v: &mut V) {
+        v.package(self);
+        for p in &self.parameters {
+            p.accept_mut(v);
+        }
+    }
+
+    pub fn mut_accept<V: MutVisitor>(&mut self, v: &V) {
+        v.package(self);
+        for p in &mut self.parameters {
+            p.mut_accept(v);
+        }
+    }
+
+    pub fn mut_accept_mut<V: MutVisitorMut>(&mut self, v: &mut V) {
+        v.package(self);
+        for p in &mut self.parameters {
+            p.mut_accept_mut(v);
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PackageParameter {
+    pub type_name: String,
+    pub type_parameters: Vec<String>,
+    pub name: String,
+    pub token: Token,
+}
+
+impl PackageParameter {
+    pub fn new(type_name: String, token: Token) -> Self {
+        Self {
+            type_name,
+            type_parameters: Vec::new(),
+            name: String::new(),
+            token,
+        }
+    }
+
+    pub fn accept<V: Visitor>(&self, v: &V) {
+        v.package_parameter(self);
+    }
+
+    pub fn accept_mut<V: VisitorMut>(&self, v: &mut V) {
+        v.package_parameter(self);
+    }
+
+    pub fn mut_accept<V: MutVisitor>(&mut self, v: &V) {
+        v.package_parameter(self);
+    }
+
+    pub fn mut_accept_mut<V: MutVisitorMut>(&mut self, v: &mut V) {
+        v.package_parameter(self);
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Header {
     pub name: String,
+    pub token: Token,
     pub members: Vec<HeaderMember>,
 }
 
 impl Header {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Header {
             name,
+            token,
             members: Vec::new(),
         }
     }
@@ -713,6 +722,7 @@ impl Header {
             NameInfo {
                 ty: Type::HeaderMethod,
                 decl: DeclarationInfo::Method,
+                token: self.token.clone(),
             },
         );
         names.insert(
@@ -720,6 +730,7 @@ impl Header {
             NameInfo {
                 ty: Type::HeaderMethod,
                 decl: DeclarationInfo::Method,
+                token: self.token.clone(),
             },
         );
         names.insert(
@@ -727,6 +738,7 @@ impl Header {
             NameInfo {
                 ty: Type::HeaderMethod,
                 decl: DeclarationInfo::Method,
+                token: self.token.clone(),
             },
         );
         for p in &self.members {
@@ -735,6 +747,7 @@ impl Header {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::HeaderMember,
+                    token: p.token.clone(),
                 },
             );
         }
@@ -802,13 +815,15 @@ impl HeaderMember {
 #[derive(Debug, Clone)]
 pub struct Struct {
     pub name: String,
+    pub token: Token,
     pub members: Vec<StructMember>,
 }
 
 impl Struct {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Struct {
             name,
+            token,
             members: Vec::new(),
         }
     }
@@ -820,6 +835,7 @@ impl Struct {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::StructMember,
+                    token: p.token.clone(),
                 },
             );
         }
@@ -887,6 +903,7 @@ impl StructMember {
 #[derive(Debug, Clone)]
 pub struct Control {
     pub name: String,
+    pub token: Token,
     pub variables: Vec<Variable>,
     pub constants: Vec<Constant>,
     pub type_parameters: Vec<String>,
@@ -897,9 +914,10 @@ pub struct Control {
 }
 
 impl Control {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Self {
             name,
+            token,
             variables: Vec::new(),
             constants: Vec::new(),
             type_parameters: Vec::new(),
@@ -922,10 +940,6 @@ impl Control {
         self.tables.iter().find(|&t| t.name == name)
     }
 
-    /// Return all the tables in this control block, recursively expanding local
-    /// control block variables and including their tables. In the returned
-    /// vector, the table in the second element of the tuple belongs to the
-    /// control in the first element.
     pub fn tables<'a>(
         &'a self,
         ast: &'a AST,
@@ -975,6 +989,7 @@ impl Control {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::Parameter(p.direction),
+                    token: p.name_token.clone(),
                 },
             );
         }
@@ -984,6 +999,7 @@ impl Control {
                 NameInfo {
                     ty: Type::Table,
                     decl: DeclarationInfo::ControlTable,
+                    token: t.token.clone(),
                 },
             );
         }
@@ -993,6 +1009,7 @@ impl Control {
                 NameInfo {
                     ty: v.ty.clone(),
                     decl: DeclarationInfo::ControlMember,
+                    token: v.token.clone(),
                 },
             );
         }
@@ -1002,6 +1019,7 @@ impl Control {
                 NameInfo {
                     ty: c.ty.clone(),
                     decl: DeclarationInfo::ControlMember,
+                    token: c.token.clone(),
                 },
             );
         }
@@ -1011,6 +1029,7 @@ impl Control {
                 NameInfo {
                     ty: Type::Action,
                     decl: DeclarationInfo::Action,
+                    token: a.token.clone(),
                 },
             );
         }
@@ -1153,7 +1172,8 @@ impl Parser {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::Parameter(p.direction),
-                },
+                    token: p.name_token.clone(),
+                }
             );
         }
         for s in &self.states {
@@ -1162,7 +1182,8 @@ impl Parser {
                 NameInfo {
                     ty: Type::State,
                     decl: DeclarationInfo::State,
-                },
+                    token: s.token.clone(),
+                }
             );
         }
         names
@@ -1270,14 +1291,16 @@ impl StatementBlock {
 #[derive(Debug, Clone)]
 pub struct Action {
     pub name: String,
+    pub token: Token,
     pub parameters: Vec<ActionParameter>,
     pub statement_block: StatementBlock,
 }
 
 impl Action {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, token: Token) -> Self {
         Self {
             name,
+            token,
             parameters: Vec::new(),
             statement_block: StatementBlock::default(),
         }
@@ -1291,7 +1314,8 @@ impl Action {
                 NameInfo {
                     ty: p.ty.clone(),
                     decl: DeclarationInfo::ActionParameter(p.direction),
-                },
+                    token: p.name_token.clone(),
+                }
             );
         }
         names
@@ -2175,6 +2199,7 @@ impl Extern {
                 NameInfo {
                     ty: Type::ExternFunction,
                     decl: DeclarationInfo::Method,
+                    token: p.token.clone(),
                 },
             );
         }
@@ -2218,6 +2243,7 @@ impl Extern {
 pub struct ExternMethod {
     pub return_type: Type,
     pub name: String,
+    pub token: Token,
     pub type_parameters: Vec<String>,
     pub parameters: Vec<ControlParameter>,
 }
@@ -2274,6 +2300,7 @@ pub enum DeclarationInfo {
 pub struct NameInfo {
     pub ty: Type,
     pub decl: DeclarationInfo,
+    pub token: Token,
 }
 
 pub trait Visitor {

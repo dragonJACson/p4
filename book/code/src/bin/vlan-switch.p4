@@ -14,7 +14,7 @@ parser parse (
 ) {
     state start {
         pkt.extract(h.eth);
-        if (h.eth.ether_type == 16w0x8100) { transition vlan; } 
+        if (h.eth.ether_type == 16w0x8100) { transition vlan; }
         transition accept;
     }
     state vlan {
@@ -32,10 +32,10 @@ control vlan(
         match = true;
     }
 
-    action filter(bit<12> port_vid) { 
-        if (port_vid == vid) { match = true; } 
+    action filter(bit<12> port_vid) {
+        if (port_vid == vid) { match = true; }
     }
-    
+
     table port_vlan {
         key             = { port: exact; }
         actions         = { no_vid_for_port; filter; }
@@ -61,7 +61,7 @@ control forward(
 
     apply { fib.apply(); }
 }
-    
+
 
 control ingress(
     inout headers_t hdr,
@@ -70,7 +70,7 @@ control ingress(
 ) {
     vlan() vlan;
     forward() fwd;
-    
+
     apply {
         bit<12> vid = 12w0;
         if (hdr.vlan.isValid()) {
@@ -106,7 +106,7 @@ control egress(
 }
 
 SoftNPU(
-    parse(), 
+    parse(),
     ingress(),
     egress()
 ) main;

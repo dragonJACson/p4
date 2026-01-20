@@ -109,6 +109,7 @@ impl<'a> HlirGenerator<'a> {
                         NameInfo {
                             ty: v.ty.clone(),
                             decl: DeclarationInfo::Local,
+                            token: v.token.clone(),
                         },
                     );
                     if let Some(initializer) = &v.initializer {
@@ -121,6 +122,7 @@ impl<'a> HlirGenerator<'a> {
                         NameInfo {
                             ty: c.ty.clone(),
                             decl: DeclarationInfo::Local,
+                            token: c.token.clone(),
                         },
                     );
                     self.expression(c.initializer.as_ref(), names);

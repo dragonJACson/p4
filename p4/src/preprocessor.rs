@@ -5,7 +5,7 @@ use std::fmt::Write;
 use std::sync::Arc;
 
 #[derive(Clone, Debug)]
-struct Macro {
+pub struct Macro {
     pub name: String,
     pub body: String,
 }
@@ -19,6 +19,7 @@ pub struct PreprocessorResult {
 #[derive(Debug, Default)]
 pub struct PreprocessorElements {
     pub includes: Vec<String>,
+    pub macros: Vec<Macro>,
 }
 
 pub fn run(
@@ -98,6 +99,8 @@ pub fn run(
     //
     // process macros
     //
+    result.elements.macros = macros_to_process.clone();
+
     for line in &new_lines {
         let mut l = line.to_string();
         for m in &macros_to_process {

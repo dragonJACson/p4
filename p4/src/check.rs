@@ -97,7 +97,7 @@ impl ControlChecker {
     pub fn check_params(c: &Control, ast: &AST, diags: &mut Diagnostics) {
         for p in &c.parameters {
             if let Type::UserDefined(typename) = &p.ty {
-                if ast.get_user_defined_type(typename).is_none() {
+                if ast.get_user_defined_type(typename.as_str()).is_none() {
                     diags.push(Diagnostic {
                         level: Level::Error,
                         message: format!("Typename {} not found", typename),
@@ -141,7 +141,7 @@ impl ControlChecker {
     pub fn check_variables(c: &Control, ast: &AST, diags: &mut Diagnostics) {
         for v in &c.variables {
             if let Type::UserDefined(typename) = &v.ty {
-                if ast.get_user_defined_type(typename).is_some() {
+                if ast.get_user_defined_type(typename.as_str()).is_some() {
                     continue;
                 }
                 if ast.get_control(typename).is_some() {
@@ -485,7 +485,7 @@ impl StructChecker {
         let mut diags = Diagnostics::new();
         for m in &s.members {
             if let Type::UserDefined(typename) = &m.ty {
-                if ast.get_user_defined_type(typename).is_none() {
+                if ast.get_user_defined_type(typename.as_str()).is_none() {
                     diags.push(Diagnostic {
                         level: Level::Error,
                         message: format!(
@@ -508,7 +508,7 @@ impl HeaderChecker {
         let mut diags = Diagnostics::new();
         for m in &h.members {
             if let Type::UserDefined(typename) = &m.ty {
-                if ast.get_user_defined_type(typename).is_none() {
+                if ast.get_user_defined_type(typename.as_str()).is_none() {
                     diags.push(Diagnostic {
                         level: Level::Error,
                         message: format!(
@@ -571,6 +571,7 @@ fn check_statement_lvalues(
                 NameInfo {
                     ty: v.ty.clone(),
                     decl: DeclarationInfo::Local,
+                    token: v.token.clone(),
                 },
             );
         }

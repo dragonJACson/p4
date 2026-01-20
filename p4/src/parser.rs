@@ -257,13 +257,14 @@ impl<'a> Parser<'a> {
 
     pub fn parse_constant(&mut self) -> Result<Constant, Error> {
         let (ty, _) = self.parse_type()?;
-        let (name, _) = self.parse_identifier("constant name")?;
+        let (name, name_token) = self.parse_identifier("constant name")?;
         self.expect_token(lexer::Kind::Equals)?;
         let initializer = self.parse_expression()?;
         self.expect_token(lexer::Kind::Semicolon)?;
         Ok(Constant {
             ty,
             name,
+            token: name_token,
             initializer,
         })
     }
@@ -682,7 +683,7 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
         let (ty, _) = self.parser.parse_type()?;
 
         // next comes a name
-        let (name, _) = self.parser.parse_identifier("constant name")?;
+        let (name, name_token) = self.parser.parse_identifier("constant name")?;
 
         // then an initializer
         self.parser.expect_token(lexer::Kind::Equals)?;
@@ -691,6 +692,7 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
         ast.constants.push(Constant {
             ty,
             name,
+            token: name_token,
             initializer,
         });
 
@@ -699,12 +701,12 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
 
     pub fn handle_header_decl(&mut self, ast: &mut AST) -> Result<(), Error> {
         // the first token of a header must be an identifier
-        let (name, _) = self.parser.parse_identifier("header name")?;
+        let (name, name_token) = self.parser.parse_identifier("header name")?;
 
         // next the header body starts with an open curly brace
         self.parser.expect_token(lexer::Kind::CurlyOpen)?;
 
-        let mut header = Header::new(name);
+        let mut header = Header::new(name, name_token);
 
         // iterate over header members
         loop {
@@ -739,12 +741,12 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
 
     pub fn handle_struct_decl(&mut self, ast: &mut AST) -> Result<(), Error> {
         // the first token of a struct must be an identifier
-        let (name, _) = self.parser.parse_identifier("struct name")?;
+        let (name, name_token) = self.parser.parse_identifier("struct name")?;
 
         // next the struct body starts with an open curly brace
         self.parser.expect_token(lexer::Kind::CurlyOpen)?;
 
-        let mut p4_struct = Struct::new(name);
+        let mut p4_struct = Struct::new(name, name_token);
 
         // iterate over struct members
         loop {
@@ -782,11 +784,15 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
         let (ty, _) = self.parser.parse_type()?;
 
         // next must be a name
-        let (name, _) = self.parser.parse_identifier("typedef name")?;
+        let (name, name_token) = self.parser.parse_identifier("typedef name")?;
 
         self.parser.expect_token(lexer::Kind::Semicolon)?;
 
-        ast.typedefs.push(Typedef { ty, name });
+        ast.typedefs.push(Typedef {
+            ty,
+            name,
+            token: name_token,
+        });
 
         Ok(())
     }
@@ -810,8 +816,8 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
     }
 
     pub fn handle_package(&mut self, ast: &mut AST) -> Result<(), Error> {
-        let (name, _) = self.parser.parse_identifier("package name")?;
-        let mut pkg = Package::new(name);
+        let (name, name_token) = self.parser.parse_identifier("package name")?;
+        let mut pkg = Package::new(name, name_token);
 
         let token = self.parser.next_token()?;
         match token.kind {
@@ -845,7 +851,7 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
         // parse functions
         loop {
             let (return_type, _) = self.parser.parse_type()?;
-            let (name, _) =
+            let (name, name_token) =
                 self.parser.parse_identifier("extern function name")?;
 
             let token = self.parser.next_token()?;
@@ -862,6 +868,7 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
             ext.methods.push(ExternMethod {
                 return_type,
                 name,
+                token: name_token,
                 type_parameters,
                 parameters,
             });
@@ -889,18 +896,20 @@ impl<'a, 'b> GlobalParser<'a, 'b> {
             match token.kind {
                 lexer::Kind::ParenClose => break,
                 lexer::Kind::Comma => continue,
-                lexer::Kind::Identifier(type_name) => {
-                    let mut parameter = PackageParameter::new(type_name);
+                lexer::Kind::Identifier(ref type_name) => {
+                    let type_token = token.clone();
                     let token = self.parser.next_token()?;
                     self.parser.backlog.push(token.clone());
+                    let mut parameter = PackageParameter::new(type_name.clone(), type_token);
                     if token.kind == lexer::Kind::AngleOpen {
                         parameter.type_parameters =
                             self.parser.parse_type_parameters()?;
                     }
-                    let (name, _) = self
+                    let (name, name_token) = self
                         .parser
                         .parse_identifier("package parameter name")?;
                     parameter.name = name;
+                    parameter.token = name_token;
                     pkg.parameters.push(parameter);
                 }
                 _ => {
@@ -972,8 +981,8 @@ impl<'a, 'b> ControlParser<'a, 'b> {
     }
 
     pub fn run(&mut self) -> Result<Control, Error> {
-        let (name, _) = self.parser.parse_identifier("control name")?;
-        let mut control = Control::new(name);
+        let (name, name_token) = self.parser.parse_identifier("control name")?;
+        let mut control = Control::new(name, name_token);
 
         //
         // check for type parameters
@@ -1094,8 +1103,8 @@ impl<'a, 'b> ActionParser<'a, 'b> {
     }
 
     pub fn run(&mut self) -> Result<Action, Error> {
-        let (name, _) = self.parser.parse_identifier("action name")?;
-        let mut action = Action::new(name);
+        let (name, name_token) = self.parser.parse_identifier("action name")?;
+        let mut action = Action::new(name, name_token);
 
         self.parse_parameters(&mut action)?;
         //self.parse_body(&mut action)?;

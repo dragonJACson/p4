@@ -159,6 +159,7 @@ impl<'a> StatementGenerator<'a> {
                     NameInfo {
                         ty: v.ty.clone(),
                         decl: DeclarationInfo::Local,
+                        token: v.token.clone(),
                     },
                 );
 
