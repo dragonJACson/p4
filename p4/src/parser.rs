@@ -6,8 +6,8 @@ use crate::ast::{
     ExpressionKind, Extern, ExternMethod, Header, HeaderMember, IfBlock,
     KeySetElement, KeySetElementValue, Lvalue, MatchKind, Package,
     PackageInstance, PackageParameter, Select, SelectElement, State, Statement,
-    StatementBlock, Struct, StructMember, Table, Transition, Type, Typedef,
-    Variable, AST,
+    StatementBlock, Struct, StructMember, Table, Transition, Type, TypeParameter,
+    Typedef, Variable, AST,
 };
 use crate::error::{Error, ParserError};
 use crate::lexer::{self, Kind, Lexer, Token};
@@ -544,6 +544,8 @@ impl<'a> Parser<'a> {
             lexer::Kind::And => Ok(Some(BinOp::BitAnd)),
             lexer::Kind::Pipe => Ok(Some(BinOp::BitOr)),
             lexer::Kind::Carat => Ok(Some(BinOp::Xor)),
+            lexer::Kind::Shl => Ok(Some(BinOp::Shl)),
+            lexer::Kind::Shr => Ok(Some(BinOp::Shr)),
 
             // TODO other binops
             _ => {
@@ -703,14 +705,14 @@ impl<'a> Parser<'a> {
         Ok(result)
     }
 
-    pub fn parse_type_parameters(&mut self) -> Result<Vec<String>, Error> {
+    pub fn parse_type_parameters(&mut self) -> Result<Vec<TypeParameter>, Error> {
         let mut result = Vec::new();
 
         self.expect_token(lexer::Kind::AngleOpen)?;
 
         loop {
-            let (ident, _) = self.parse_identifier("type parameter name")?;
-            result.push(ident);
+            let (ident, token) = self.parse_identifier("type parameter name")?;
+            result.push(TypeParameter::new(ident, token));
 
             let token = self.next_token()?;
             match token.kind {

@@ -11,10 +11,45 @@ pub struct MacroDefinition {
     pub body: String,
 }
 
+/// Macro environment that can be passed between files during preprocessing.
+/// This enables macros defined in one included file to be visible in
+/// subsequently included files.
+#[derive(Clone, Debug, Default)]
+pub struct MacroEnv {
+    pub map: HashMap<String, String>,
+    pub ordered: Vec<MacroDefinition>,
+}
+
+impl MacroEnv {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn define(&mut self, name: String, body: String) {
+        self.map.insert(name.clone(), body.clone());
+        self.ordered.push(MacroDefinition { name, body });
+    }
+
+    pub fn undefine(&mut self, name: &str) {
+        self.map.remove(name);
+        self.ordered.retain(|m| m.name != name);
+    }
+
+    pub fn is_defined(&self, name: &str) -> bool {
+        self.map.contains_key(name)
+    }
+
+    pub fn get(&self, name: &str) -> Option<&String> {
+        self.map.get(name)
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct PreprocessorResult {
     pub elements: PreprocessorElements,
     pub lines: Vec<String>,
+    /// The macro environment after processing this file
+    pub env_out: MacroEnv,
 }
 
 #[derive(Debug, Default)]
@@ -25,13 +60,26 @@ pub struct PreprocessorElements {
     pub macros: Vec<MacroDefinition>,
 }
 
+/// Preprocess a file with an empty macro environment.
 pub fn run(
     source: &str,
     filename: Arc<String>,
 ) -> Result<PreprocessorResult, PreprocessorError> {
+    run_with_env(source, filename, &MacroEnv::default())
+}
+
+/// Preprocess a file with a given input macro environment.
+/// Macros from `env_in` will be available for conditional compilation
+/// and text substitution. The returned result includes `env_out` which
+/// contains all macros (from input + defined in this file).
+pub fn run_with_env(
+    source: &str,
+    filename: Arc<String>,
+    env_in: &MacroEnv,
+) -> Result<PreprocessorResult, PreprocessorError> {
     let mut result = PreprocessorResult::default();
-    let mut macros_to_process = Vec::new();
-    let mut defined_macros: HashMap<String, String> = HashMap::new();
+    let mut macros_to_process: Vec<MacroDefinition> = env_in.ordered.clone();
+    let mut defined_macros: HashMap<String, String> = env_in.map.clone();
     let mut current_macro: Option<MacroDefinition> = None;
 
     //
@@ -223,6 +271,12 @@ pub fn run(
         }
         result.lines.push(l);
     }
+
+    // Build the output macro environment
+    result.env_out = MacroEnv {
+        map: defined_macros,
+        ordered: macros_to_process,
+    };
 
     Ok(result)
 }

@@ -7,6 +7,19 @@ use std::hash::{Hash, Hasher};
 
 use crate::lexer::Token;
 
+/// A type parameter with its associated token for source location tracking.
+#[derive(Debug, Clone)]
+pub struct TypeParameter {
+    pub name: String,
+    pub token: Token,
+}
+
+impl TypeParameter {
+    pub fn new(name: String, token: Token) -> Self {
+        Self { name, token }
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct AST {
     pub constants: Vec<Constant>,
@@ -224,7 +237,7 @@ impl PackageInstance {
 #[derive(Debug)]
 pub struct Package {
     pub name: String,
-    pub type_parameters: Vec<String>,
+    pub type_parameters: Vec<TypeParameter>,
     pub parameters: Vec<PackageParameter>,
 
     /// The token for the package name.
@@ -273,7 +286,7 @@ impl Package {
 #[derive(Debug)]
 pub struct PackageParameter {
     pub type_name: String,
-    pub type_parameters: Vec<String>,
+    pub type_parameters: Vec<TypeParameter>,
     pub name: String,
 
     /// The token for the parameter name.
@@ -675,6 +688,8 @@ pub enum BinOp {
     BitAnd,
     BitOr,
     Xor,
+    Shl,
+    Shr,
 }
 
 impl BinOp {
@@ -691,6 +706,8 @@ impl BinOp {
             BinOp::BitAnd => "bitwise and",
             BinOp::BitOr => "bitwise or",
             BinOp::Xor => "xor",
+            BinOp::Shl => "shift left",
+            BinOp::Shr => "shift right",
         }
     }
 
@@ -920,7 +937,7 @@ pub struct Control {
     pub name: String,
     pub variables: Vec<Variable>,
     pub constants: Vec<Constant>,
-    pub type_parameters: Vec<String>,
+    pub type_parameters: Vec<TypeParameter>,
     pub parameters: Vec<ControlParameter>,
     pub actions: Vec<Action>,
     pub tables: Vec<Table>,
@@ -994,12 +1011,7 @@ impl Control {
     }
 
     pub fn is_type_parameter(&self, name: &str) -> bool {
-        for t in &self.type_parameters {
-            if t == name {
-                return true;
-            }
-        }
-        false
+        self.type_parameters.iter().any(|t| t.name == name)
     }
 
     pub fn names(&self) -> HashMap<String, NameInfo> {
@@ -1155,7 +1167,7 @@ impl PartialEq for Control {
 #[derive(Debug, Clone)]
 pub struct Parser {
     pub name: String,
-    pub type_parameters: Vec<String>,
+    pub type_parameters: Vec<TypeParameter>,
     pub parameters: Vec<ControlParameter>,
     pub states: Vec<State>,
     pub decl_only: bool,
@@ -1177,12 +1189,7 @@ impl Parser {
     }
 
     pub fn is_type_parameter(&self, name: &str) -> bool {
-        for t in &self.type_parameters {
-            if t == name {
-                return true;
-            }
-        }
-        false
+        self.type_parameters.iter().any(|t| t.name == name)
     }
 
     pub fn names(&self) -> HashMap<String, NameInfo> {
@@ -2266,7 +2273,7 @@ impl Extern {
 pub struct ExternMethod {
     pub return_type: Type,
     pub name: String,
-    pub type_parameters: Vec<String>,
+    pub type_parameters: Vec<TypeParameter>,
     pub parameters: Vec<ControlParameter>,
 
     /// The token for the method name.

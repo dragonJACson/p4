@@ -191,6 +191,8 @@ impl<'a> ExpressionGenerator<'a> {
             BinOp::BitAnd => quote! { & },
             BinOp::BitOr => quote! { | },
             BinOp::Xor => quote! { ^ },
+            BinOp::Shl => quote! { << },
+            BinOp::Shr => quote! { >> },
         }
     }
 
